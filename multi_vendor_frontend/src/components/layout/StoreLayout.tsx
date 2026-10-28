@@ -1,8 +1,6 @@
-
-import { Navbar } from "./navbar"
-import { Footer } from "./footer"
+import { Navbar } from "./Navbar"
 import {Outlet} from "react-router-dom"
-
+import { Footer } from "./Footer"
 
 export const StoreLayout = () => {
   return (
