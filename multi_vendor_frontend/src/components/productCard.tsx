@@ -1,12 +1,12 @@
 import { Star, ShoppingCart } from "lucide-react";
 
-import { Badge } from "../../@/components/ui/badge";
-import { Button } from "../../@/components/ui/button";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
-} from "../../@/components/ui/card";
+} from "./ui/card";
 
 import type { Product } from "@/types/product";
 
