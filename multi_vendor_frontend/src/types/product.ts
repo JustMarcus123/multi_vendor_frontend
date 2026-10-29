@@ -10,3 +10,6 @@ interface Product{
     stock: number;
     vendorName: string
 }
+
+
+export type UserRole = "customer" | "vendor" | "admin";
