@@ -1,6 +1,6 @@
 import { Store, EyeOff, Eye, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/product";
 
@@ -11,13 +11,28 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role,setRole] = useState('customer')
+  const [role,setRole] = useState<UserRole>('customer')
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("")
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const handleSubmit=()=>{
-    
+    console.log("login successful");
+    const demoUser ={name: name || email.split("@")[0], email, role};
+   localStorage.setItem("multi_vendor", JSON.stringify(demoUser));
+   setMessage(
+    isRegister? "Your demo account has been created" : "You're signed in to the demo.");
+
+    const requestedPage = searchParams.get("next");
+    window.setTimeout(()=>{
+      if(requestedPage) navigate(requestedPage);
+      else if(role === "admin") navigate("/admin");
+      else if(role ==="vendor") navigate("/vendor");
+      else navigate("/");
+    }, 500);
   }
+
 
   return (
     <div>
