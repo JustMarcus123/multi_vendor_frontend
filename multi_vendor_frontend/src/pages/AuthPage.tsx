@@ -3,34 +3,66 @@ import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/product";
+import { loginUser, registerUser } from "@/components/Service/authApi";
 
 export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode == "register";
 
   //let's handle the state for the inputs
   const [name, setName] = useState("");
+    console.log(name);
   const [email, setEmail] = useState("");
+    console.log(email);
   const [password, setPassword] = useState("");
+  console.log(password);
   const [role,setRole] = useState<UserRole>('customer')
+    console.log(role);
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting , setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("")
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const handleSubmit=()=>{
-    console.log("login successful");
-    const demoUser ={name: name || email.split("@")[0], email, role};
-   localStorage.setItem("multi_vendor", JSON.stringify(demoUser));
-   setMessage(
-    isRegister? "Your demo account has been created" : "You're signed in to the demo.");
+  async function handleSubmit(){
+   
+    setMessage("");
+    setIsSubmitting(true);
 
-    const requestedPage = searchParams.get("next");
+
+    try {
+
+      if(isRegister){
+        await registerUser({
+          name,
+          email,
+          password
+        });
+        setMessage("account created successfully");
+      }else{
+        await loginUser({
+          email,
+          password
+        })
+        setMessage("login successful");
+
+      }
+
+       const requestedPage = searchParams.get("next");
     window.setTimeout(()=>{
       if(requestedPage) navigate(requestedPage);
       else if(role === "admin") navigate("/admin");
       else if(role ==="vendor") navigate("/vendor");
       else navigate("/");
     }, 500);
+
+      
+    } catch (error) {
+      setMessage(
+       "something went wrong"
+      );
+    }finally{
+      setIsSubmitting(false)
+    }
   }
 
 
@@ -132,11 +164,13 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
                   type={showPassword ? "text" : "password"}
                   className="field pr-11"
                   value={password}
+                  
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter a password"
                   minLength={6}
                   required
                 />
+                
                 <button
                   type="button"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -168,8 +202,12 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
                 </p>
               </div>
             )}
-            <Button type="submit" className="w-full" size="lg">
-              {isRegister ? "Create demo account" : "Sign in to demo"}{" "}
+            <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+              {
+                isSubmitting ? "please wait... " 
+                :isRegister ? "Create Account" :"Sign in"
+              }
+              
               <ArrowRight size={16} />
             </Button>
           </form>

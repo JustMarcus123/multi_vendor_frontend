@@ -18,7 +18,7 @@ export const Navbar = () => {
           <Store size={20}/>
         </span>
         <span className="text-xl font-black tracking-tight text-slate-900">
-          Market <span className="text-indigo-600">Hub</span>
+          Market <span className="text-indigo-600">Hub</span>̃
         </span>
         </Link>
 
