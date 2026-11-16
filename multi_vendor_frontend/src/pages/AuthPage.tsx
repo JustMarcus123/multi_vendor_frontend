@@ -39,7 +39,8 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
         await registerUser({
           name,
           email,
-          password
+          password,
+          role
         });
         setMessage("account created successfully");
       }else{

@@ -5,6 +5,7 @@ export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
+  role:string
 }
 
 export interface LoginPayload {
@@ -17,7 +18,7 @@ export interface AuthResponse {
     id: string;
     name: string;
     email: string;
-    // role: "CUSTOMER" | "VENDOR" | "ADMIN";
+    role: "CUSTOMER" | "VENDOR" | "ADMIN";
   };
 }
 
