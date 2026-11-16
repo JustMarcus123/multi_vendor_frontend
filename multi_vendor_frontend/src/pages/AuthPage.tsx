@@ -1,5 +1,5 @@
 import { Store, EyeOff, Eye, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/product";
@@ -10,21 +10,25 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
 
   //let's handle the state for the inputs
   const [name, setName] = useState("");
-    console.log(name);
+    // console.log(name);
   const [email, setEmail] = useState("");
-    console.log(email);
+    // console.log(email);
   const [password, setPassword] = useState("");
-  console.log(password);
+  // console.log(password);
   const [role,setRole] = useState<UserRole>('customer')
-    console.log(role);
+    // console.log(role);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting , setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("")
+  // console.log(message)
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  async function handleSubmit(){
-   
+
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>){
+
+    event.preventDefault();
     setMessage("");
     setIsSubmitting(true);
 
@@ -39,14 +43,15 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
         });
         setMessage("account created successfully");
       }else{
-        await loginUser({
+       const response = await loginUser({
           email,
           password
         })
+        console.log(response)
+        
         setMessage("login successful");
 
       }
-
        const requestedPage = searchParams.get("next");
     window.setTimeout(()=>{
       if(requestedPage) navigate(requestedPage);
@@ -57,9 +62,12 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
 
       
     } catch (error) {
-      setMessage(
-       "something went wrong"
-      );
+        console.error("LOGIN ERROR:", error);
+        setMessage(
+    error instanceof Error
+      ? error.message
+      : "Unknown error occurred"
+  );
     }finally{
       setIsSubmitting(false)
     }

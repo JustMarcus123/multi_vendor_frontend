@@ -14,14 +14,15 @@ export async function apiRequest <T>(
         },
     });
 
+    const responseText = await response.text();
 
-    const responseText = response.text();
+    const data =  responseText ? JSON.parse(responseText): null;
+
     console.log("API URL:", `${API_VITE_URL}${endpoints}`);
     console.log("Status:", response.status);
     console.log("Response:", responseText);
 
 
-    const data = await response.json();
 
 
     if(!response.ok){
