@@ -1,5 +1,6 @@
 
 import { apiRequest } from "@/lib/API";
+import type { UserRole } from "@/types/product";
 
 export interface RegisterPayload {
   name: string;
@@ -18,7 +19,7 @@ export interface AuthResponse {
     id: string;
     name: string;
     email: string;
-    role: "CUSTOMER" | "VENDOR" | "ADMIN";
+    role: UserRole;
   };
 }
 
@@ -34,4 +35,12 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export function getMe() {
+  return apiRequest<AuthResponse>("/auth/me");   //this is send to check who is logged in
+}
+
+export function logoutUser() {
+  return apiRequest<{ message: string }>("/auth/logout", { method: "POST" });
 }
