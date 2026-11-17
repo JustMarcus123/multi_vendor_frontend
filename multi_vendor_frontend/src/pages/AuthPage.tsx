@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/product";
 import { loginUser, registerUser } from "@/components/Service/authApi";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode == "register";
@@ -25,6 +26,8 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const navigate = useNavigate();
 
 
+  const {setUser} = useAuth();
+
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>){
 
@@ -34,6 +37,8 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
 
 
     try {
+
+      let userRole: string = role;
 
       if(isRegister){
         await registerUser({
@@ -47,21 +52,19 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
        const response = await loginUser({
           email,
           password
-        })
-        console.log(response)
-        
+        });
+        setUser(response.user);
+        userRole = response.user.role;
+        // console.log(response)   
         setMessage("login successful");
-
       }
        const requestedPage = searchParams.get("next");
     window.setTimeout(()=>{
       if(requestedPage) navigate(requestedPage);
-      else if(role === "admin") navigate("/admin");
-      else if(role ==="vendor") navigate("/vendor");
+      else if(userRole === "admin") navigate("/admin");
+      else if(userRole ==="vendor") navigate("/vendor");
       else navigate("/");
     }, 500);
-
-      
     } catch (error) {
         console.error("LOGIN ERROR:", error);
         setMessage(

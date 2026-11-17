@@ -8,6 +8,7 @@ export async function apiRequest <T>(
 
     const response = await fetch(`${API_VITE_URL}${endpoints}`,{
         ...options,
+        credentials: "include", 
         headers:{
             "Content-type":"application/json",
             ...options.headers
