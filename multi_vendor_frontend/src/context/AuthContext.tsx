@@ -27,8 +27,13 @@ export function AuthProvider({children}: {children:React.ReactNode}){
         .finally(()=>setLoading(false));
     },[])
     async function logout(){
-        await logoutUser();
-        setUser(null);
+        try {
+             await logoutUser();
+            } finally{
+            setUser(null); // runs even if the request failed
+            
+        }
+       
     }
 
     return( <AuthContext.Provider value={{user, loading,setUser, logout}}>
