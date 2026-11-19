@@ -6,11 +6,14 @@ export async function apiRequest <T>(
     options: RequestInit ={},
 ):Promise<T>{
 
+
+    const isFormData = options.body instanceof FormData;  //important fix to check if the body is a formdata file upload
+
     const response = await fetch(`${API_VITE_URL}${endpoints}`,{
         ...options,
         credentials: "include", 
         headers:{
-            "Content-type":"application/json",
+           ...(isFormData)?{}: {"Content-type":"application/json"},
             ...options.headers
         },
     });

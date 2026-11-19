@@ -31,7 +31,6 @@ export function AuthProvider({children}: {children:React.ReactNode}){
              await logoutUser();
             } finally{
             setUser(null); // runs even if the request failed
-            
         }
        
     }

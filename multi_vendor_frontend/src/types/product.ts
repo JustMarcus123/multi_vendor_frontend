@@ -1,5 +1,5 @@
 
-interface Product{
+export interface Product{
     id: number;
     name:string;
     price: number;
@@ -8,7 +8,8 @@ interface Product{
     image:string;
     rating: number;
     stock: number;
-    vendorName: string
+    vendorName: string;
+    reviewCount: number
 }
 
 
