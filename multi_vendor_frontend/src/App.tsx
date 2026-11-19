@@ -5,6 +5,9 @@ import AuthPage from "./pages/AuthPage"
 import VendorLayout from "./components/vendor/VendorLayout"
 import { GuestOnly, RequiredRole } from "./components/RequireRoles"
 import AdminDashboard from "./components/admin/AdminDashboard"
+import VendorDashboard from "./pages/Vendor/VendorDashboard"
+import VendorProductsPage from "./pages/Vendor/VendorProductPage"
+import VendorOrdersPage from "./pages/Vendor/VendorOrderPage"
 
 
  export default function App (){
@@ -26,6 +29,11 @@ import AdminDashboard from "./components/admin/AdminDashboard"
 
         {/* vendor */}
         <Route path="/vendor/*" element={<RequiredRole roles={["vendor", "admin"]}><VendorLayout/></RequiredRole>}>
+
+        <Route index element={<VendorDashboard/>}/>
+        <Route path="products" element={<VendorProductsPage/>} />
+        <Route path="orders" element={<VendorOrdersPage/>}/>
+
         </Route>
 
         {/* admin */}
