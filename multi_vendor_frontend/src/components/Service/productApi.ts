@@ -1,4 +1,5 @@
 import { apiRequest } from "@/lib/API";
+import type { VendorProduct } from "@/pages/Vendor/VendorProductPage";
 
 
 
@@ -13,9 +14,18 @@ export interface ProductType{
 }
 
 
+
 export function createProductApi(form: FormData) {
-  return apiRequest<{ product: unknown }>("/vendor/products", {
+  return apiRequest<{ product: ProductType }>("/vendor/products", {
     method: "POST",
     body: form,
   });
+}
+
+export function getProductApi(){
+
+ return apiRequest<{products:VendorProduct[]}>("/vendor/products",{
+  method: "GET"
+ })
+
 }

@@ -5,7 +5,30 @@ import type { Product } from "@/types/product";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ProductCategory } from "@/lib/ProductCategory";
-import { createProductApi } from "@/components/Service/productApi";
+import { createProductApi, type ProductType } from "@/components/Service/productApi";
+import { getProductApi } from '../../components/Service/productApi';
+import { CategoryApi } from "@/components/Service/ProductCategoryApi";
+
+
+export interface VendorProduct {
+  id: string; // or _id: string depending on what your backend returns
+  name: string;
+  category: string;
+  price: number;
+  // category: string;
+  stock: number;
+  images?: string[];
+}
+
+export interface ProductCategory {
+  _id:number;
+   name: string;
+  slug: string;
+  category: string;
+  isActive: boolean; 
+}
+
+
 
 export default function VendorProductsPage() {
   const [items, setItems] = useState<Product[]>(initialProducts.slice(0, 5));
@@ -13,10 +36,17 @@ export default function VendorProductsPage() {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<ProductCategory []>([]);
+  console.log("category", categories);
+  const [category, setCategory] = useState("")
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [product, setProduct] = useState<VendorProduct []>([]);
+ 
+  console.log(product);
+  const [error, setError] = useState("")
 const [stock, setStock] = useState("");
 const [showPreview, setShowPreview] = useState(false);
 // Generate a temporary local URL to preview the selected image
@@ -42,7 +72,7 @@ async function handleProductSave(e: React.FormEvent<HTMLFormElement>) {
 
   const fd = new FormData();
   fd.append("name", name);
-  fd.append("description", description);
+  fd.append("category", category);
   fd.append("price", price);
   fd.append("stock", stock);
   images.forEach((file) => fd.append("images", file));
@@ -50,12 +80,98 @@ async function handleProductSave(e: React.FormEvent<HTMLFormElement>) {
   try {
     await createProductApi(fd); // from your authApi/productApi file
     // reset the form, refetch the list, close the form...
-    setShowForm(false);
-    setImages([]);
+     setName("");
+      setPrice("");
+      setCategory("");
+      setStock("");
+      setDescription("");
+      setImages([]);
+      setShowPreview(false);
+      setShowForm(false);
   } catch (error) {
     console.error(error);
   }
 }
+
+//fetching product
+
+useEffect(() => {
+  let isMounted = true;
+
+  async function fetchProducts() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await getProductApi();
+
+      if (isMounted) {
+        setProduct(data.products ?? []);
+      }
+    } catch (error) {
+      if (isMounted) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load products"
+        );
+      }
+    } finally {
+      if (isMounted) {
+        setLoading(false);
+      }
+    }
+  }
+
+  fetchProducts();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
+
+
+// to fetch category when this page is mounted
+useEffect(()=>{
+
+  let isMounted = true;
+
+  async function CategoryData(){
+
+    try {
+
+      setLoading(true);
+
+      const categoryData = await CategoryApi()
+
+      // console.log("categories" ,categoryData);
+  
+      if(isMounted){
+        setCategories(categoryData ?? [])
+      }
+      
+    } catch (error) {
+      if(isMounted){
+        setError(
+          error instanceof Error ? error.message : "Failed to load product Category"
+        )
+      }
+    }finally{
+      if(isMounted){
+        setLoading(false)
+      }
+    }
+
+  } 
+
+
+  CategoryData();
+
+  return ()=>{
+    isMounted = true;
+  }
+
+},[])
 
 
 
@@ -65,8 +181,8 @@ async function handleProductSave(e: React.FormEvent<HTMLFormElement>) {
 
   
 
-  function deleteProduct(id: number) {
-    setItems((current) => current.filter((item) => item.id !== id));
+  function deleteProduct(id: string) {
+    setProduct((current) => current.filter((item) => item.id !== id));
   }
 
   return (
@@ -126,9 +242,9 @@ async function handleProductSave(e: React.FormEvent<HTMLFormElement>) {
                 onChange={(e) => setCategory(e.target.value)}
               >
                   <option value="" disabled>Select a category</option>
-               {  ProductCategory.map((item)=>(
-                <option key={item.id} value={item.value} >
-                    {item.value}
+               {  categories.map((cat)=>(
+                <option key={cat._id} value={cat.name} >
+                    {cat.name}
                 </option>
                ))     }
               </select>
@@ -216,17 +332,19 @@ async function handleProductSave(e: React.FormEvent<HTMLFormElement>) {
               </tr>
             </thead>
             <tbody>
-              {filteredItems.map((item) => (
+              {product.map((item) => (
                 <tr key={item.id} className="border-t border-slate-100">
                   <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={item.image}
-                        alt=""
-                        className="h-12 w-12 rounded-lg object-cover"
-                      />
-                      <span className="font-bold">{item.name}</span>
-                    </div>
+                    <div className="flex gap-2">
+  {item.images?.map((image, index) => (
+    <img
+      key={index}
+      src={image}
+      alt={`${item.name} ${index + 1}`}
+      className="h-12 w-12 rounded-lg object-cover"
+    />
+  ))}
+</div>
                   </td>
                   <td className="px-5 py-4 text-slate-500">{item.category}</td>
                   <td className="px-5 py-4 font-semibold">
